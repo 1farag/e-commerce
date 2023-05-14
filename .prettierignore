@@ -1,0 +1,10 @@
+**/.git
+**/.svn
+**/.hg
+**/node_modules
+.prettierrc.json
+.editorconfig
+.gitignore
+package.json
+package-lock.json
+.eslintrc.cjs
