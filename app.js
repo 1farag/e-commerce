@@ -14,15 +14,15 @@ app.use(morgan("tiny"));
 app.use(helmet());
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 15, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true,
-  legacyHeaders: false,
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 15, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+	standardHeaders: true,
+	legacyHeaders: false,
 });
 
 app.use(limiter);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is running on PORT ${PORT}`);
+	// eslint-disable-next-line no-console
+	console.log(`Server is running on PORT ${PORT}`);
 });
