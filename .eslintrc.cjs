@@ -14,6 +14,7 @@ module.exports = {
     ".eslintrc.cjs",
     ".gitignore",
     ".github/**",
+    "__test__/**",
   ],
   parserOptions: {
     ecmaVersion: 12,
@@ -23,7 +24,7 @@ module.exports = {
   rules: {
     quotes: ["error", "double"],
     "no-console": "warn",
-    "no-unused-vars": ["error", { args: "none" }],
+    "no-unused-vars": ["warn", { args: "none" }],
     "no-fallthrough": "warn",
     "no-extra-boolean-cast": "warn",
     "no-extra-semi": "warn",
