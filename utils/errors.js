@@ -37,3 +37,9 @@ export class FailedVerifyPassword extends Error {
 		super("The password does not match");
 	}
 }
+
+export class RouteNotFound extends Error {
+	constructor() {
+		super("Requested route doesn't exist");
+	}
+}

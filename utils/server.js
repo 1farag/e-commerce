@@ -9,6 +9,8 @@ import apiRoutes from "../routes/index.router.js";
 import connect from "./connectDB.js";
 import mongoSanitize from "express-mongo-sanitize";
 import { google } from "googleapis";
+import { globalErrorHandling } from "../middleware/errorHandling.js";
+import notFoundRoute from "../middleware/notfoundRoute.js";
 
 dotenv.config();
 
@@ -33,18 +35,8 @@ export default function createServer() {
 			replaceWith: "_",
 		})
 	);
-
-	const scopes = [
-		"profile",
-		"email",
-		"openid",
-		"https://www.googleapis.com/auth/user.birthday.read",
-		"https://www.googleapis.com/auth/user.emails.read",
-		"https://www.googleapis.com/auth/user.organization.read",
-		"https://www.googleapis.com/auth/userinfo.email",
-		"https://www.googleapis.com/auth/userinfo.profile",
-	];
-
+	app.use(notFoundRoute);
+	app.use(globalErrorHandling);
 	app.get("api/auth-test", (req, res) => {
 		// Define your Google OAuth 2.0 credentials
 		const credentials = {
@@ -62,7 +54,16 @@ export default function createServer() {
 		// Generate the authentication URL
 		const authURL = oAuth2Client.generateAuthUrl({
 			access_type: "offline",
-			scope: scopes,
+			scope: [
+				"profile",
+				"email",
+				"openid",
+				"https://www.googleapis.com/auth/user.birthday.read",
+				"https://www.googleapis.com/auth/user.emails.read",
+				"https://www.googleapis.com/auth/user.organization.read",
+				"https://www.googleapis.com/auth/userinfo.email",
+				"https://www.googleapis.com/auth/userinfo.profile",
+			],
 		});
 
 		res.redirect(authURL);
