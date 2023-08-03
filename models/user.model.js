@@ -71,17 +71,22 @@ UserSchema.methods.isValidPassword = async function (password) {
 
 UserSchema.methods.generateAuthToken = async function (useragent) {
 	const user = this;
-	const token = jwt.sign({ _id: user._id, useragent }, "process.env.JWT_SECRET", {
+	const token = jwt.sign({ _id: user._id, useragent }, process.env.JWT_SECRET, {
 		expiresIn: process.env.JWT_EXPIRES_IN,
 	});
 	return token;
 };
 
+// delete password and salt from user object
 UserSchema.methods.toJSON = function () {
 	const user = this;
 	const userObject = user.toObject();
 	delete userObject.password;
 	delete userObject.salt;
+	delete userObject.verificationCode;
+	delete userObject.passwordChangedAt;
+	delete userObject.googleId;
+	delete userObject.registeredWithGoogle;
 	return userObject;
 };
 
