@@ -1,4 +1,4 @@
-import jwt, { TokenExpiredError } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import { asyncHandler } from "./errorHandling.js";
 import TokenBlackList from "../models/token.model.js";
@@ -6,6 +6,7 @@ import {
 	AuthenticationError,
 	BlackListError,
 	InvalidHeaderToken,
+	TokenExpiredError,
 	TokenIsBlocked,
 } from "../utils/errors.js";
 
@@ -20,7 +21,7 @@ export const auth = asyncHandler(async (req, res, next) => {
 		throw new InvalidHeaderToken();
 	}
 	// check if token is blacklisted
-	const blacklist = await TokenBlackList.findOne({ where: { token: token } });
+	const blacklist = await TokenBlackList.findOne({ token: token });
 	if (blacklist) {
 		throw new TokenIsBlocked();
 	}
@@ -28,10 +29,8 @@ export const auth = asyncHandler(async (req, res, next) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 	const user = await User.findOne({
-		where: {
-			id: decoded.id,
-			blocked: false,
-		},
+		_id: decoded._id,
+		blocked: false,
 	});
 
 	if (!user) {
@@ -41,12 +40,13 @@ export const auth = asyncHandler(async (req, res, next) => {
 		const passChangedTimestamp = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
 		// Password changed after token created (Error)
 		if (passChangedTimestamp > decoded.iat) {
-			throw new TokenExpiredError("token is Expired");
+			throw new TokenExpiredError();
 		}
 	}
 	// check if user-agent is the same
 	if (req.get("user-agent") != decoded.useragent) {
-		await TokenBlackList.create({ token: token });
+		const addToBlaackList = new TokenBlackList({ token: token });
+		addToBlaackList.save();
 		throw new BlackListError();
 	}
 	req.user = user;
