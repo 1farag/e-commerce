@@ -1,18 +1,14 @@
 /* eslint-disable no-console */
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import apiRoutes from "../routes/index.router.js";
+import apiRoutes from "../routes/index.js";
 import connect from "./connectDB.js";
 import mongoSanitize from "express-mongo-sanitize";
-import { google } from "googleapis";
 import { globalErrorHandling } from "../middleware/errorHandling.js";
 import notFoundRoute from "../middleware/notfoundRoute.js";
-
-dotenv.config();
 
 export default function createServer() {
 	const app = express();
@@ -24,7 +20,7 @@ export default function createServer() {
 	connect();
 	const limiter = rateLimit({
 		windowMs: 15 * 60 * 1000,
-		max: 15,
+		max: 20,
 		standardHeaders: true,
 		legacyHeaders: false,
 	});
@@ -35,40 +31,9 @@ export default function createServer() {
 			replaceWith: "_",
 		})
 	);
-	app.use(notFoundRoute);
-	app.use(globalErrorHandling);
-	app.get("api/auth-test", (req, res) => {
-		// Define your Google OAuth 2.0 credentials
-		const credentials = {
-			client_id: process.env.GOOGLE_CLIENT_ID,
-			client_secret: process.env.GOOGLE_CLIENT_SECRET,
-			redirect_uris: [`${req.protocol}://${req.headers.host}/api/auth`],
-		};
-		// Create the OAuth2 client
-		const oAuth2Client = new google.auth.OAuth2(
-			credentials.client_id,
-			credentials.client_secret,
-			credentials.redirect_uris[0]
-		);
-
-		// Generate the authentication URL
-		const authURL = oAuth2Client.generateAuthUrl({
-			access_type: "offline",
-			scope: [
-				"profile",
-				"email",
-				"openid",
-				"https://www.googleapis.com/auth/user.birthday.read",
-				"https://www.googleapis.com/auth/user.emails.read",
-				"https://www.googleapis.com/auth/user.organization.read",
-				"https://www.googleapis.com/auth/userinfo.email",
-				"https://www.googleapis.com/auth/userinfo.profile",
-			],
-		});
-
-		res.redirect(authURL);
-	});
 
 	app.use("/api", apiRoutes);
+	app.use(notFoundRoute);
+	app.use(globalErrorHandling);
 	return app;
 }
