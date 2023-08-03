@@ -9,17 +9,17 @@ import { CreatedResponse } from "../utils/response/response.index.js";
 export const register = asyncHandler(async (req, res) => {
 	const result = await registerServiece(req);
 	const response = new CreatedResponse([result], req);
-	res.status(response.statusCode).send(response.getResponseJSON());
+	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
 export const signInByEmail = asyncHandler(async (req, res) => {
 	const result = await signInServiece(req);
 	const response = new CreatedResponse([result], req);
-	res.status(response.statusCode).send(response.getResponseJSON());
+	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
 export const signInByGoogle = asyncHandler(async (req, res) => {
 	const result = await googleSignIn(req);
 	const response = new CreatedResponse([result], req);
-	res.status(response.statusCode).send(response.getResponseJSON());
+	res.status(response.statusCode).json(response.getResponseJSON());
 });

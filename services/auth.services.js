@@ -80,3 +80,4 @@ export const googleSignIn = async (req) => {
 	const token = await user.generateAuthToken(req.get("user-agent"));
 	return { user, token };
 };
+

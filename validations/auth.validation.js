@@ -33,38 +33,37 @@ const signupSchema = {
 			password: z.string().min(8).max(50).regex(passwordRegex),
 			confirmPassword: z.string().min(8).max(50).regex(passwordRegex),
 		})
-		.strict()
 		.refine((data) => data.confirmPassword === data.password, {
 			message: "The passwords did not match",
 		}),
 };
+
+export const signup_Validator = z.object({
+	...signupSchema,
+});
+
 const signinSchema = {
-	password: z.string().min(8).max(50).regex(passwordRegex),
-	email: z
-		.string({
-			invalid_type_error: "email should be string",
-			required_error: "email is required",
+	body: z
+		.object({
+			password: z.string().min(8).max(50).regex(passwordRegex),
+			email: z
+				.string({
+					invalid_type_error: "email should be string",
+					required_error: "email is required",
+				})
+				.trim()
+				.email({ message: "Invalid email address" })
+				.toLowerCase(),
 		})
-		.trim()
-		.email({ message: "Invalid email address" })
-		.toLowerCase(),
+		.strip(),
 };
 const googleSignInSchema = {
 	query: z.object({
 		code: z.string().trim(),
 	}),
 };
-export const signup_Validator = z
-	.object({
-		...signupSchema,
-	})
-	.strict();
 
-export const signin_Validator = z
-	.object({
-		...signinSchema,
-	})
-	.strict();
+export const signin_Validator = z.object({ ...signinSchema });
 
 export const googleSignIn_Validator = z
 	.object({
