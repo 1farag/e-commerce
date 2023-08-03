@@ -1,14 +1,20 @@
+import multer from "multer";
 import {
 	AuthenticationError,
 	BlackListError,
 	DocumentDoesNotExist,
+	InvalidFileFormat,
+	InvalidFileType,
 	InvalidHeaderToken,
 	RouteNotFound,
+	TokenExpiredError,
 	TokenIsBlocked,
+	ZodError,
 } from "../utils/errors.js";
 import InternalServerResponse from "../utils/response/Failed/InternalServerErrorResponse.class.js";
 import NotFoundRouteResponse from "../utils/response/Failed/NotFoundRouteResponse.class.js";
 import {
+	BadReqResponse,
 	ForbiddenResponse,
 	NotFoundResponse,
 	UnauthorizedResponse,
@@ -25,6 +31,14 @@ export const asyncHandler = (fn) => {
 export const globalErrorHandling = (err, req, res, next) => {
 	let response;
 	if (err instanceof DocumentDoesNotExist) response = new NotFoundResponse(req, err);
+	else if (
+		err instanceof ZodError ||
+		err instanceof InvalidFileType ||
+		err instanceof InvalidFileFormat ||
+		err instanceof TokenExpiredError ||
+		err instanceof multer.MulterError
+	)
+		response = new BadReqResponse(req, err);
 	else if (err instanceof RouteNotFound) response = new NotFoundRouteResponse(req, err);
 	else if (err instanceof AuthenticationError || err instanceof InvalidHeaderToken)
 		response = new UnauthorizedResponse(req, err);
@@ -35,6 +49,6 @@ export const globalErrorHandling = (err, req, res, next) => {
 	if (process.env.MOOD == "DEV") {
 		return res.status(response.statusCode || 500).json(response.getResponseJSON());
 	}
-
+	console.log(err);
 	return res.status(response.statusCode).json(response.getResponseJSON());
 };

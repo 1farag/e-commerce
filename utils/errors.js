@@ -9,6 +9,12 @@ export class TokenIsBlocked extends Error {
 	}
 }
 
+export class TokenExpiredError extends Error {
+	constructor() {
+		super("Token Expired");
+	}
+}
+
 export class AuthenticationError extends Error {
 	constructor() {
 		super("Should be authenticate to access this route");
@@ -43,3 +49,26 @@ export class RouteNotFound extends Error {
 		super("Requested route doesn't exist");
 	}
 }
+
+export class ZodError extends Error {
+	constructor(err) {
+		const msg = err.errors.map((issue) => {
+			const errorMessage = `${issue.path.join(".")} : ${issue.message} `;
+			return errorMessage;
+		});
+		super(msg);
+	}
+}
+
+export class InvalidFileType extends Error {
+	constructor() {
+		super("Invalid file type");
+	}
+}
+
+export class InvalidFileFormat extends Error {
+	constructor(fileFormat) {
+		super(`Invalid ${fileFormat} format.`);
+	}
+}	
+
