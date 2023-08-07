@@ -6,6 +6,7 @@ import {
 } from "../utils/errors.js";
 import generateRandomPassword from "../utils/generanting.js";
 import { google } from "googleapis";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const registerServiece = async (req) => {
 	const { email, password, firstName, lastName } = req.body;
@@ -80,4 +81,62 @@ export const googleSignIn = async (req) => {
 	const token = await user.generateAuthToken(req.get("user-agent"));
 	return { user, token };
 };
+// verify email
+/**
+ * req.user.email
+ * if user is verified => throw error
+ * call @generateVerificationCode 
+ * call @sendEmail
+ * send email with verification code
+ */
+export const verifiedEmail = async (req) => {
+	const user = req.user;
+	if (user.isVerified) throw new Error("User is already verified");
+	const verificationCode = await user.generateVerificationCode();
+	await sendEmail(user.email, verificationCode, "Verification Code");
+	await user.save();
+	return "Email sent";
+};
+
+
+
+
+/**
+ * req.body.email, req.body.verificationCode
+ * call @checkVerificationCode
+ * if true => set isVerified to true
+ * else => throw error
+ */
+
+
+// forget password request
+/**
+ * req.body.email
+ * call @generateVerificationCode
+ * call @sendEmail
+ * send email with verification code
+ */
+
+// forget password verification
+/**
+ * req.body.email, req.body.verificationCode
+ * call @checkVerificationCode
+ * if true => set isVerified to true
+ * else => throw error 
+ * 	
+ */
+
+
+// change password
+/**
+ * req.body.password, req.body.newPassword , req.body.confirmNewPasswordPassword
+ * 
+ * check if newPassword === confirmNewPassword
+ * if true => call @isValidPassword
+ * if true => set password to newPassword
+ * else => throw error
+	
+ */
+
+
 

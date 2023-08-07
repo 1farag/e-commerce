@@ -9,6 +9,7 @@ import connect from "./connectDB.js";
 import mongoSanitize from "express-mongo-sanitize";
 import { globalErrorHandling } from "../middleware/errorHandling.js";
 import notFoundRoute from "../middleware/notfoundRoute.js";
+import { sendEmail } from "./sendEmail.js";
 
 export default function createServer() {
 	const app = express();
@@ -35,5 +36,6 @@ export default function createServer() {
 	app.use("/api", apiRoutes);
 	app.use(notFoundRoute);
 	app.use(globalErrorHandling);
+
 	return app;
 }

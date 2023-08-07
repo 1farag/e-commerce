@@ -22,7 +22,7 @@ module.exports = {
   },
   extends: ["eslint:recommended", "prettier"],
   rules: {
-    quotes: ["error", "double"],
+    quotes: ["warn", "double"],
     "no-console": "warn",
     "no-unused-vars": ["warn", { args: "none" }],
     "no-fallthrough": "warn",
