@@ -60,6 +60,12 @@ const UserSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	pendingEmail: {
+		type: String,
+	},
+	pendingEmailVerificationCode: {
+		type: String,
+	},
 });
 
 UserSchema.methods.isValidPassword = async function (password) {
@@ -106,6 +112,13 @@ UserSchema.methods.verifyCode = async function (code) {
 	return compare;
 };
 
+UserSchema.methods.generateEmailToken = async function () {
+	const user = this;
+	const token = jwt.sign({ _id: user._id }, process.env.JWT_EMAIL_SECRET, {
+		expiresIn: process.env.JWT_EMAIL_EXPIRES_IN,
+	});
+	return token;
+};
 UserSchema.pre("save", async function (next) {
 	const user = this;
 	if (user.isModified("password")) {
