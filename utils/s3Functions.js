@@ -59,8 +59,13 @@ export const deleteFile = async (req) => {
 		Bucket: bucketName,
 		Key: key,
 	};
-	await s3Client.send(new DeleteObjectCommand(params));
-	return { message: "File deleted successfully" };
+	try {
+		await s3Client.send(new DeleteObjectCommand(params));
+		return { message: "File deleted successfully" };
+	} catch (error) {
+		throw new Error("Failed to delete file");
+	}
+	
 };
 
 // Get a list of files

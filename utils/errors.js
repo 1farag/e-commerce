@@ -8,6 +8,29 @@ export class TokenIsBlocked extends Error {
 		super(" Your Token is blocked, please login again");
 	}
 }
+export class InvalidToken extends Error {
+	constructor() {
+		super("In-valid Token");
+	}
+}
+
+export class UserAlreadyVerified extends Error {
+	constructor() {
+		super("User already verified");
+	}
+}
+
+export class InvalidCode extends Error {
+	constructor() {
+		super("Invalid verification code");
+	}
+}
+
+export class EmailAlreadyVerified extends Error {
+	constructor() {
+		super("Email already verified");
+	}
+}
 
 export class TokenExpiredError extends Error {
 	constructor() {

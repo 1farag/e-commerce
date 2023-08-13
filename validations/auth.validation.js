@@ -69,4 +69,4 @@ export const googleSignIn_Validator = z
 	.object({
 		...googleSignInSchema,
 	})
-	.strict();
+	.strip();
