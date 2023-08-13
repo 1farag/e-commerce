@@ -3,6 +3,8 @@ import {
 	DocumentDoesNotExist,
 	FailedToCreate,
 	FailedVerifyPassword,
+	InvalidCode,
+	UserAlreadyVerified,
 } from "../utils/errors.js";
 import generateRandomPassword from "../utils/generanting.js";
 import { google } from "googleapis";
@@ -81,62 +83,55 @@ export const googleSignIn = async (req) => {
 	const token = await user.generateAuthToken(req.get("user-agent"));
 	return { user, token };
 };
-// verify email
-/**
- * req.user.email
- * if user is verified => throw error
- * call @generateVerificationCode 
- * call @sendEmail
- * send email with verification code
- */
+
 export const verifiedEmail = async (req) => {
 	const user = req.user;
-	if (user.isVerified) throw new Error("User is already verified");
+	if (user.isVerified) throw UserAlreadyVerified();
 	const verificationCode = await user.generateVerificationCode();
 	await sendEmail(user.email, verificationCode, "Verification Code");
 	await user.save();
 	return "Email sent";
 };
 
+export const checkVerificationCodeEmail = async (req) => {
+	const { verificationCode } = req.body;
 
+	const user = await User.findById(req.user._id);
+	if (!user) throw new DocumentDoesNotExist("user");
+	const checkCode = await user.verifyCode(verificationCode);
+	if (!checkCode) throw InvalidCode();
+	user.isVerified = true;
+	user.verificationCode = null;
+	await user.save();
+	return "Email verified";
+};
 
+export const forgetPasswordRequest = async (req) => {
+	const { email } = req.body;
+	const user = await User.findOne({ email });
+	if (!user) throw new DocumentDoesNotExist("user");
+	const verificationCode = await user.generateVerificationCode();
+	await sendEmail(email, verificationCode, "Verification Code");
+	await user.save();
+};
 
-/**
- * req.body.email, req.body.verificationCode
- * call @checkVerificationCode
- * if true => set isVerified to true
- * else => throw error
- */
+export const forgetPasswordVerification = async (req) => {
+	const { email, verificationCode, password } = req.body;
+	const user = await User.findOne({ email });
+	if (!user) throw new DocumentDoesNotExist("user");
+	const checkCode = await user.verifyCode(verificationCode);
+	if (!checkCode) throw InvalidCode();
+	user.password = password;
+	await user.save();
+};
 
+export const changePassword = async (req) => {
+	const { password, newPassword } = req.body;
+	const user = req.user;
+	const checkPassword = await user.isValidPassword(password);
+	if (!checkPassword) throw new FailedVerifyPassword();
 
-// forget password request
-/**
- * req.body.email
- * call @generateVerificationCode
- * call @sendEmail
- * send email with verification code
- */
-
-// forget password verification
-/**
- * req.body.email, req.body.verificationCode
- * call @checkVerificationCode
- * if true => set isVerified to true
- * else => throw error 
- * 	
- */
-
-
-// change password
-/**
- * req.body.password, req.body.newPassword , req.body.confirmNewPasswordPassword
- * 
- * check if newPassword === confirmNewPassword
- * if true => call @isValidPassword
- * if true => set password to newPassword
- * else => throw error
-	
- */
-
-
-
+	user.password = newPassword;
+	await user.save();
+	return "Password changed successfully";
+};
