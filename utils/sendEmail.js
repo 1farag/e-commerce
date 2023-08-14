@@ -6,7 +6,7 @@ dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 //ES6
-export const sendEmail = async (email, msg, subject = "No Subject") => {
+const sendEmail = async (email, msg, subject = "No Subject") => {
 	const form = {
 		to: email,
 		from: process.env.SENDGRID_FROM_EMAIL,
@@ -24,3 +24,5 @@ export const sendEmail = async (email, msg, subject = "No Subject") => {
 		}
 	}
 };
+
+export default sendEmail;
