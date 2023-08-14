@@ -44,7 +44,7 @@ export const getProfileById = asyncHandler(async (req, res) => {
 // update email
 export const updateEmail = asyncHandler(async (req, res) => {
 	await updateEmailDB(req);
-	const response = new UpdatedResponse([], req);
+	const response = new UpdatedResponse([], req, "please check your email");
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 

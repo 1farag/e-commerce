@@ -10,7 +10,7 @@ const updateUserSchema = {
 };
 
 const updateEmailSchema = {
-	Body: z
+	body: z
 		.object({
 			newEmail: z.string().email().min(3).max(255),
 		})

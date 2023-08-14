@@ -1,3 +1,5 @@
+import { ZodError } from "../utils/errors.js";
+
 export function validateRequest(schema) {
 	return async function (req, res, next) {
 		try {
@@ -15,7 +17,7 @@ export function validateRequest(schema) {
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.log(err);
-			return res.status(400).json({ message: "validation err", err: err.message });
+			next(new ZodError(err));
 		}
 
 		return next();

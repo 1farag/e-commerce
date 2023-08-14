@@ -8,7 +8,7 @@ import {
 } from "../utils/errors.js";
 import generateRandomPassword from "../utils/generanting.js";
 import { google } from "googleapis";
-import { sendEmail } from "../utils/sendEmail.js";
+import sendEmail from "../utils/sendEmail.js";
 
 export const registerServiece = async (req) => {
 	const { email, password, firstName, lastName } = req.body;

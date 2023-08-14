@@ -5,7 +5,7 @@ import {
 	InvalidToken,
 } from "../utils/errors.js";
 import { deleteFile, getSignedUrlForUpload } from "../utils/s3Functions.js";
-import { sendEmail } from "../utils/sendEmail.js";
+import sendEmail from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 
 export const updateProfilePictureDB = async (req) => {
@@ -87,11 +87,7 @@ export const updateEmailDB = async (req) => {
 	 \n\n ${url} \n\n If you did not request this, please ignore this email and your password will remain unchanged.
 	  \n\n If you want to resend the email verification link, please click on the link below: \n\n ${resending}`;
 
-	await sendEmail({
-		email: newEmail,
-		subject: "Email verification token",
-		message,
-	});
+	await sendEmail(newEmail, "Email verification token", message);
 };
 
 export const verifyNewEmailDB = async (req) => {
