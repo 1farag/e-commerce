@@ -38,10 +38,6 @@ const signupSchema = {
 		}),
 };
 
-export const signup_Validator = z.object({
-	...signupSchema,
-});
-
 const signinSchema = {
 	body: z
 		.object({
@@ -57,16 +53,45 @@ const signinSchema = {
 		})
 		.strip(),
 };
+
 const googleSignInSchema = {
 	query: z.object({
 		code: z.string().trim(),
 	}),
 };
 
-export const signin_Validator = z.object({ ...signinSchema });
+const verifyEmailSchema = {
+	params: z.object({
+		token: z.string().min(3).max(255),
+	}),
+};
 
-export const googleSignIn_Validator = z
-	.object({
-		...googleSignInSchema,
-	})
-	.strip();
+const forgotPasswordSchema = {
+	body: z.object({
+		email: z.string().email({ message: "Invalid email address" }).trim(),
+	}),
+};
+
+const resetPasswordSchema = {
+	body: z.object({
+		OTP: z.string().min(3).max(255),
+		password: z.string().min(8).max(50).regex(passwordRegex),
+		confirmPassword: z.string().min(8).max(50).regex(passwordRegex),
+	}),
+};
+
+const changePasswordSchema = {
+	body: z.object({
+		oldPassword: z.string().min(8).max(50).regex(passwordRegex),
+		newPassword: z.string().min(8).max(50).regex(passwordRegex),
+		confirmPassword: z.string().min(8).max(50).regex(passwordRegex),
+	}),
+};
+
+export const changePassword_Validator = z.object({ ...changePasswordSchema }).strip();
+export const resetPassword_Validator = z.object({ ...resetPasswordSchema }).strip();
+export const forgotPassword_Validator = z.object({ ...forgotPasswordSchema }).strip();
+export const googleSignIn_Validator = z.object({ ...googleSignInSchema }).strip();
+export const signup_Validator = z.object({ ...signupSchema }).strip();
+export const verifyEmailValidator = z.object({ ...verifyEmailSchema }).strip();
+export const signin_Validator = z.object({ ...signinSchema }).strip();

@@ -5,7 +5,7 @@ const clientAuthReq = (req, res) => {
 	const credentials = {
 		client_id: process.env.GOOGLE_CLIENT_ID,
 		client_secret: process.env.GOOGLE_CLIENT_SECRET,
-		redirect_uris: [`${req.protocol}://${req.headers.host}/api/auth`],
+		redirect_uris: [`${req.protocol}://${req.headers.host}/api/auth/google/`],
 	};
 	// Create the OAuth2 client
 	const oAuth2Client = new google.auth.OAuth2(

@@ -45,10 +45,11 @@ export const auth = asyncHandler(async (req, res, next) => {
 	}
 	// check if user-agent is the same
 	if (req.get("user-agent") != decoded.useragent) {
-		const addToBlaackList = new TokenBlackList({ token: token });
-		addToBlaackList.save();
+		const addToBlackList = new TokenBlackList({ token: token });
+		addToBlackList.save();
 		throw new BlackListError();
 	}
 	req.user = user;
+	req.token = token;
 	return next();
 });

@@ -112,3 +112,10 @@ export class FailedToDelete extends Error {
 		super(`Failed to delete file : ${err.message}`);
 	}
 }
+
+
+export class FailedToSendEmail extends Error {
+	constructor(err) {
+		super(`Failed to send email : ${err.message}`);
+	}
+}

@@ -1,14 +1,18 @@
 import User from "../models/user.model.js";
 import {
 	DocumentDoesNotExist,
+	EmailAlreadyVerified,
 	FailedToCreate,
 	FailedVerifyPassword,
 	InvalidCode,
+	InvalidToken,
 	UserAlreadyVerified,
 } from "../utils/errors.js";
 import generateRandomPassword from "../utils/generanting.js";
 import { google } from "googleapis";
 import sendEmail from "../utils/sendEmail.js";
+import jwt from "jsonwebtoken";
+import TokenBlackList from "../models/token.model.js";
 
 export const registerServiece = async (req) => {
 	const { email, password, firstName, lastName } = req.body;
@@ -64,6 +68,10 @@ export const googleSignIn = async (req) => {
 	let user = await User.findOne({
 		email,
 	});
+	if (user && !user.isVerified) {
+		user.isVerified = true;
+		await user.save();
+	}
 
 	if (!user) {
 		const genPass = generateRandomPassword();
@@ -84,48 +92,70 @@ export const googleSignIn = async (req) => {
 	return { user, token };
 };
 
-export const verifiedEmail = async (req) => {
-	const user = req.user;
-	if (user.isVerified) throw UserAlreadyVerified();
-	const verificationCode = await user.generateVerificationCode();
-	await sendEmail(user.email, verificationCode, "Verification Code");
-	await user.save();
-	return "Email sent";
+export const logoutDB = async (req) => {
+	const token = new TokenBlackList({
+		token: req.token,
+	});
+	await token.save();
 };
 
-export const checkVerificationCodeEmail = async (req) => {
-	const { verificationCode } = req.body;
+export const verifyNewEmailDB = async (req) => {
+	const { token } = req.params;
 
-	const user = await User.findById(req.user._id);
-	if (!user) throw new DocumentDoesNotExist("user");
-	const checkCode = await user.verifyCode(verificationCode);
-	if (!checkCode) throw InvalidCode();
+	const decoded = jwt.verify(token, process.env.JWT_EMAIL_SECRET);
+
+	if (!decoded) throw new InvalidToken();
+
+	const user = await User.findById(decoded.id);
+
+	if (!user) throw new DocumentDoesNotExist();
+
+	if (user.isVerified) throw new UserAlreadyVerified();
+
 	user.isVerified = true;
-	user.verificationCode = null;
+
 	await user.save();
-	return "Email verified";
+
+	return user;
 };
 
-export const forgetPasswordRequest = async (req) => {
+export const refreshEmailDB = async (req) => {
+	const { userId } = req.params;
+	const user = await User.findById(userId);
+	if (!user) throw new DocumentDoesNotExist();
+	if (!user.isVerified) throw EmailAlreadyVerified();
+	const token = await user.generateEmailToken();
+	const url = `${process.env.CLIENT_URL}/verify-email/${token}`;
+
+	await sendEmail({
+		email: user.email,
+		subject: "Email verification token",
+		message: `Please click on the link below to verify your email address: \n\n ${url}`,
+	});
+	return "Email sent successfully";
+};
+
+export const forgetPasswordDB = async (req) => {
 	const { email } = req.body;
 	const user = await User.findOne({ email });
 	if (!user) throw new DocumentDoesNotExist("user");
 	const verificationCode = await user.generateVerificationCode();
-	await sendEmail(email, verificationCode, "Verification Code");
+	await sendEmail(email, "Verification Code", verificationCode);
 	await user.save();
 };
 
-export const forgetPasswordVerification = async (req) => {
+export const forgetPasswordVerificationDB = async (req) => {
 	const { email, verificationCode, password } = req.body;
 	const user = await User.findOne({ email });
 	if (!user) throw new DocumentDoesNotExist("user");
 	const checkCode = await user.verifyCode(verificationCode);
 	if (!checkCode) throw InvalidCode();
 	user.password = password;
+	user.passwordChangedAt = Date.now();
 	await user.save();
 };
 
-export const changePassword = async (req) => {
+export const changePasswordDB = async (req) => {
 	const { password, newPassword } = req.body;
 	const user = req.user;
 	const checkPassword = await user.isValidPassword(password);
@@ -135,3 +165,5 @@ export const changePassword = async (req) => {
 	await user.save();
 	return "Password changed successfully";
 };
+
+

@@ -4,6 +4,7 @@ import addressSchema from "./address.model.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import sendEmail from "../utils/sendEmail.js";
+import { FailedToSendEmail } from "../utils/errors.js";
 const UserSchema = new mongoose.Schema({
 	profileImgUrl: {
 		type: String,
@@ -106,6 +107,14 @@ UserSchema.methods.verifyCode = async function (code) {
 	return compare;
 };
 
+UserSchema.methods.generateEmailToken = async function () {
+	const user = this;
+	const token = jwt.sign({ _id: user._id }, process.env.JWT_EMAIL_SECRET, {
+		expiresIn: process.env.JWT_EMAIL_EXPIRES_IN,
+	});
+	return token;
+};
+
 UserSchema.pre("save", async function (next) {
 	const user = this;
 	if (user.isModified("password")) {
@@ -117,9 +126,22 @@ UserSchema.pre("save", async function (next) {
 		user.passwordChangedAt = Date.now();
 	}
 	if (user.isModified("email")) {
-		const verificationCode = await user.generateVerificationCode();
+		const token = await user.generateEmailToken();
 		user.isVerified = false;
-		await sendEmail(user.email, verificationCode, "Verification Code");
+		const url = `${process.env.CLIENT_URL}/verify-email/${token}`;
+		const resending = `${process.env.CLIENT_URL}/resend-email/${user._id}`;
+		const message = `Please click on the link below to verify your email address:
+	 \n\n ${url} \n\n If you did not request this, please ignore this email and your password will remain unchanged.
+	  \n\n If you want to resend the email verification link, please click on the link below: \n\n ${resending}`;
+		try {
+			await sendEmail({
+				email: user.email,
+				subject: "Email verification",
+				message,
+			});
+		} catch (error) {
+			next(new FailedToSendEmail());
+		}
 	}
 	next();
 });
