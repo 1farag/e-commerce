@@ -3,6 +3,7 @@ import {
 	AuthenticationError,
 	BlackListError,
 	DocumentDoesNotExist,
+	EmailAlreadyExists,
 	EmailAlreadyVerified,
 	InvalidCode,
 	InvalidFileFormat,
@@ -51,7 +52,11 @@ export const globalErrorHandling = (err, req, res, next) => {
 		response = new UnauthorizedResponse(req, err);
 	else if (err instanceof BlackListError || err instanceof TokenIsBlocked)
 		res = new ForbiddenResponse(req, err);
-	else if (err instanceof UserAlreadyVerified || err instanceof EmailAlreadyVerified)
+	else if (
+		err instanceof UserAlreadyVerified ||
+		err instanceof EmailAlreadyVerified ||
+		err instanceof EmailAlreadyExists
+	)
 		response = new ConflictResponse(req, err);
 	else response = new InternalServerResponse(req, err);
 

@@ -23,9 +23,9 @@ const s3Client = new S3Client({
 	},
 });
 // Get a signed URL for uploading a file
-export const getSignedUrlForUpload = async (req) => {
+export const getSignedUrlForUpload = async (req, folder) => {
 	const { originalname } = req.file;
-	const key = `${uuidv4()}-${originalname}`;
+	const key = `${folder}/${uuidv4()}-${originalname}`;
 	const params = new PutObjectCommand({
 		Bucket: bucketName,
 		Body: req.file.buffer,

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import addressSchema from "./address.model.js";
 import jwt from "jsonwebtoken";
 import argon2 from "argon2";
+import sendEmail from "../utils/sendEmail.js";
 const UserSchema = new mongoose.Schema({
 	profileImgUrl: {
 		type: String,
@@ -60,12 +61,6 @@ const UserSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
-	pendingEmail: {
-		type: String,
-	},
-	pendingEmailVerificationCode: {
-		type: String,
-	},
 });
 
 UserSchema.methods.isValidPassword = async function (password) {
@@ -83,7 +78,6 @@ UserSchema.methods.generateAuthToken = async function (useragent) {
 	return token;
 };
 
-// delete password and salt from user object
 UserSchema.methods.toJSON = function () {
 	const user = this;
 	const userObject = user.toObject();
@@ -112,13 +106,6 @@ UserSchema.methods.verifyCode = async function (code) {
 	return compare;
 };
 
-UserSchema.methods.generateEmailToken = async function () {
-	const user = this;
-	const token = jwt.sign({ _id: user._id }, process.env.JWT_EMAIL_SECRET, {
-		expiresIn: process.env.JWT_EMAIL_EXPIRES_IN,
-	});
-	return token;
-};
 UserSchema.pre("save", async function (next) {
 	const user = this;
 	if (user.isModified("password")) {
@@ -128,6 +115,11 @@ UserSchema.pre("save", async function (next) {
 		user.password = hash;
 		user.salt = salt;
 		user.passwordChangedAt = Date.now();
+	}
+	if (user.isModified("email")) {
+		const verificationCode = await user.generateVerificationCode();
+		user.isVerified = false;
+		await sendEmail(user.email, verificationCode, "Verification Code");
 	}
 	next();
 });

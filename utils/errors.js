@@ -95,3 +95,20 @@ export class InvalidFileFormat extends Error {
 	}
 }	
 
+export class EmailAlreadyExists extends Error {
+	constructor() {
+		super("Email already exists");
+	}
+}
+
+export class FailedToUpload extends Error {
+	constructor(err) {
+		super(`Failed to upload file : ${err.message}`);
+	}
+}
+
+export class FailedToDelete extends Error {
+	constructor(err) {
+		super(`Failed to delete file : ${err.message}`);
+	}
+}
