@@ -84,3 +84,27 @@ export const deleteProfilePictureDB = async (req) => {
 		session.endSession();
 	}
 };
+
+// soft delete user
+
+export const deleteUserDB = async (userId) => {
+	const session = await User.startSession();
+
+	try {
+		session.startTransaction();
+		const user = await User.findById(userId).session(session);
+
+		if (!user) throw new DocumentDoesNotExist();
+
+		if (user.profilePicture) await deleteFile(user.profilePicture);
+		
+		await user.remove();
+		await session.commitTransaction();
+
+	} catch (error) {
+		await session.abortTransaction();
+		throw new FailedToDelete(error);
+	} finally {
+		session.endSession();
+	}
+}

@@ -13,16 +13,18 @@ const userRouter = Router();
 userRouter
 	.route("/profile")
 	.get(auth, controller.getProfile)
-	.put(validateRequest(updateUserValidator), controller.updateProfile);
+	.put(validateRequest(updateUserValidator), controller.updateProfile)
+	.delete(auth, controller.deleteUser);
 
 userRouter
-	.route("/profile-picture")
+	.route("/profile/picture")
 	.patch(auth, accessFile("image").single("picture"), controller.updateProfilePicture)
 	.delete(auth, controller.deleteProfilePicture);
 
 userRouter
 	.route("/:userId")
-	.get(auth, validateRequest(getUserByIdValidator), controller.getProfileById);
+	.get(auth, validateRequest(getUserByIdValidator), controller.getProfileById)
+	.delete(auth, validateRequest(getUserByIdValidator), controller.deleteUserById);
 
 
 

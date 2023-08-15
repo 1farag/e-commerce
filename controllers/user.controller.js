@@ -1,6 +1,7 @@
 import { asyncHandler } from "../middleware/errorHandling.js";
 import {
 	deleteProfilePictureDB,
+	deleteUserDB,
 	getProfileByIdDB,
 	updateProfileDB,
 	updateProfilePictureDB,
@@ -37,3 +38,13 @@ export const getProfileById = asyncHandler(async (req, res) => {
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
+export const deleteUser = asyncHandler(async (req, res) => {
+	await deleteUserDB(req.user._id);
+	const response = new UpdatedResponse([], req, "User deleted successfully");
+	res.status(response.statusCode).json(response.getResponseJSON());
+});
+export const deleteUserById = asyncHandler(async (req, res) => {
+	await deleteUserDB(req.params.userId);
+	const response = new UpdatedResponse([], req, "User deleted successfully");
+	res.status(response.statusCode).json(response.getResponseJSON());
+});
