@@ -1,5 +1,4 @@
 import { z } from "zod";
-import mongoose from "mongoose";
 
 class APIResponse {
 	static ACTION_METHODS = {
@@ -38,8 +37,8 @@ class APIResponse {
 		this.req = req;
 		this.message = message;
 		this.page = 1;
-		this.size = 1;
 		this.data = this.normalizeData(data);
+		this.size = data.length;
 		this.totalPages = 1;
 	}
 

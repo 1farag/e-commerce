@@ -4,7 +4,6 @@ export default class RetrivedResponse extends SuccessResponse {
 	constructor(data, req, message, paginate) {
 		super(data, req, message);
 		if (paginate) {
-			this.size = data.length;
 			this.page = paginate.page;
 			this.totalPages = paginate.totalPages;
 		}

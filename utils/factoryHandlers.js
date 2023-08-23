@@ -37,7 +37,7 @@ export const retriveAll = (model, modelName) =>
 			filter = req.filter;
 		}
 		const numDocuments = await model.countDocuments();
-		const apiFeatures = new ApiFeatures(model.find(), req.query)
+		const apiFeatures = new ApiFeatures(model.find({ ...filter }), req.query)
 			.paginate(numDocuments)
 			.sort()
 			.limitFields()
@@ -45,14 +45,14 @@ export const retriveAll = (model, modelName) =>
 			.search(modelName);
 
 		const { mongooseQuery, pagination } = apiFeatures;
-		const result = await mongooseQuery;
+		const result = await mongooseQuery.exec();
 		const response = new RetrivedResponse(result, req, "success", pagination);
 		res.status(response.statusCode).json(response.getResponseJSON());
 	});
 
 export const updateOne = (model) =>
 	asyncHandler(async (req, res, next) => {
-		const result = await model.findByIdAndUpdate(req.params.id, req.body, {
+		const result = await model.findOneAndUpdate({ _id: req.params.id }, req.body, {
 			new: true,
 		});
 		if (!result) return next(new DocumentDoesNotExist(`${model.modelName}`));
