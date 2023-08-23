@@ -10,16 +10,6 @@ class APIResponse {
 		GET: "retrieving",
 	};
 
-	static SENSITIVE_FIELDS = [
-		"password",
-		"salt",
-		"verificationCode",
-		"passwordChangedAt",
-		"googleId",
-		"registeredWithGoogle",
-		"__v",
-	];
-
 	static responseZodSchema = z
 		.object({
 			success: z.boolean(),
@@ -36,24 +26,8 @@ class APIResponse {
 
 	normalizeData(data) {
 		return data.map((document) => {
-			if (document instanceof mongoose.Document) {
-				return this.removeSensitiveFields(
-					document.toObject({
-						virtuals: true,
-						versionKey: false,
-					})
-				);
-			}
 			return document;
 		});
-	}
-
-	removeSensitiveFields(obj) {
-		const result = { ...obj };
-		for (const field of APIResponse.SENSITIVE_FIELDS) {
-			delete result[field];
-		}
-		return result;
 	}
 
 	constructor(statusCode, data, success, req, message) {
@@ -63,23 +37,8 @@ class APIResponse {
 		this.httpMethod = req.method;
 		this.req = req;
 		this.message = message;
-
-		let page;
-		let size;
-
-		if (req.query) {
-			page = parseInt(req.query.page);
-			size = parseInt(req.query.size);
-		}
-
-		if (req.method !== "GET" || data.length === 0) {
-			page = 1;
-			size = 1;
-		}
-
-		this.page = page ? parseInt(page) : 1;
-		this.size = size ? parseInt(size) : 5;
-
+		this.page = 1;
+		this.size = 1;
 		this.data = this.normalizeData(data);
 		this.totalPages = 1;
 	}

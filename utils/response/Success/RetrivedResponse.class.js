@@ -1,14 +1,14 @@
 import SuccessResponse from "./SuccessResponse.class.js";
 
 export default class RetrivedResponse extends SuccessResponse {
-	constructor(data, req, message) {
+	constructor(data, req, message, paginate) {
 		super(data, req, message);
-		if (data instanceof Array) {
-			if (data.length == 0) {
-				if (data[0].token) data = Object.assign({}, data[0]);
-				this.size = 0;
-			}
+		if (paginate) {
+			this.size = data.length;
+			this.page = paginate.page;
+			this.totalPages = paginate.totalPages;
 		}
+		this.statusCode = RetrivedResponse.STATUS_CODE().OK;
 		this.message = message || RetrivedResponse.SUCCESS_MESSAGES().RETRIVED;
 	}
 }
