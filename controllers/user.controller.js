@@ -6,7 +6,11 @@ import {
 	updateProfileDB,
 	updateProfilePictureDB,
 } from "../services/user.services.js";
-import { UpdatedResponse } from "../utils/response/response.index.js";
+import {
+	DeletedResopnse,
+	RetrivedResponse,
+	UpdatedResponse,
+} from "../utils/response/response.index.js";
 
 export const updateProfilePicture = asyncHandler(async (req, res) => {
 	const result = await updateProfilePictureDB(req);
@@ -16,7 +20,7 @@ export const updateProfilePicture = asyncHandler(async (req, res) => {
 
 export const deleteProfilePicture = asyncHandler(async (req, res) => {
 	const result = await deleteProfilePictureDB(req);
-	const response = new UpdatedResponse([result], req);
+	const response = new DeletedResopnse([result], req);
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
@@ -28,23 +32,23 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
 export const getProfile = asyncHandler(async (req, res) => {
 	const result = await getProfileByIdDB(req.user._id);
-	const response = new UpdatedResponse([result], req);
+	const response = new RetrivedResponse([result], req);
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
 export const getProfileById = asyncHandler(async (req, res) => {
 	const result = await getProfileByIdDB(req.params.userId);
-	const response = new UpdatedResponse([result], req);
+	const response = new RetrivedResponse([result], req);
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 
 export const deleteUser = asyncHandler(async (req, res) => {
 	await deleteUserDB(req.user._id);
-	const response = new UpdatedResponse([], req, "User deleted successfully");
+	const response = new DeletedResopnse([], req, "User deleted successfully");
 	res.status(response.statusCode).json(response.getResponseJSON());
 });
 export const deleteUserById = asyncHandler(async (req, res) => {
 	await deleteUserDB(req.params.userId);
-	const response = new UpdatedResponse([], req, "User deleted successfully");
+	const response = new DeletedResopnse([], req, "User deleted successfully");
 	res.status(response.statusCode).json(response.getResponseJSON());
 });

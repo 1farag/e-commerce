@@ -5,64 +5,83 @@ import jwt from "jsonwebtoken";
 import argon2 from "argon2";
 import sendEmail from "../utils/sendEmail.js";
 import { FailedToSendEmail } from "../utils/errors.js";
-const UserSchema = new mongoose.Schema({
-	profileImgUrl: {
-		type: String,
-		default: "",
+
+const UserSchema = new mongoose.Schema(
+	{
+		profileImgUrl: {
+			type: String,
+			default: "",
+		},
+		firstName: {
+			type: String,
+			required: [true, "First name is required"],
+			trim: true,
+			minlength: [3, "First name must be at least 3 characters"],
+			maxlength: [20, "First name must be at most 20 characters"],
+		},
+		lastName: {
+			type: String,
+			required: [true, "Last name is required"],
+			trim: true,
+			lowercase: true,
+			minlength: [3, "Last name must be at least 3 characters"],
+			maxlength: [20, "Last name must be at most 20 characters"],
+			min: 3,
+		},
+		email: {
+			type: String,
+			required: [true, "Email is required"],
+			trim: true,
+			unique: true,
+			lowercase: true,
+		},
+		password: {
+			type: String,
+			required: "Password is required",
+			minlength: [8, "Too short password, minimum length is 8 characters"],
+		},
+		passwordChangedAt: Date,
+
+		salt: {
+			type: String,
+			required: false,
+		},
+		address: {
+			type: [addressSchema],
+			default: [],
+		},
+		isVerified: {
+			type: Boolean,
+			required: true,
+			default: false,
+		},
+		verificationCode: {
+			type: String,
+		},
+		blocked: {
+			type: Boolean,
+			required: true,
+			default: false,
+		},
+		googleId: {
+			type: String,
+		},
+		registeredWithGoogle: {
+			type: Boolean,
+			default: false,
+		},
 	},
-	firstName: {
-		type: String,
-		required: true,
-		trim: true,
-		min: 3,
-		max: 20,
-	},
-	lastName: {
-		type: String,
-		required: true,
-		trim: true,
-		min: 3,
-	},
-	email: {
-		type: String,
-		required: true,
-		trim: true,
-		unique: true,
-	},
-	password: {
-		type: String,
-		required: true,
-	},
-	passwordChangedAt: Date,
-	salt: {
-		type: String,
-		required: false,
-	},
-	address: {
-		type: [addressSchema],
-		default: [],
-	},
-	isVerified: {
-		type: Boolean,
-		required: true,
-		default: false,
-	},
-	verificationCode: {
-		type: String,
-	},
-	blocked: {
-		type: Boolean,
-		required: true,
-		default: false,
-	},
-	googleId: {
-		type: String,
-	},
-	registeredWithGoogle: {
-		type: Boolean,
-		default: false,
-	},
+	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
+
+UserSchema.virtual("fullName").get(function () {
+	return `${this.firstName} ${this.lastName}`;
 });
+
+UserSchema.index({ fullName: 1, email: 1 });
+
+
+
 
 UserSchema.methods.isValidPassword = async function (password) {
 	const user = this;

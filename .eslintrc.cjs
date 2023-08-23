@@ -36,7 +36,7 @@ module.exports = {
     "no-unused-expressions": "warn",
     "no-useless-return": "warn",
     "no-var": "warn",
-    "prefer-const": "warn",
+    "prefer-const": "off",
     "prefer-template": "warn",
     "no-useless-concat": "warn",
     "no-useless-rename": "warn",

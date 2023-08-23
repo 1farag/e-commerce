@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import z from "zod";
 
 const updateUserSchema = {
@@ -13,7 +14,9 @@ const updateUserSchema = {
 const getUserByIdSchema = {
 	params: z
 		.object({
-			userId: z.string().min(3).max(255),
+			userId: z
+				.string()
+				.refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid user id"),
 		})
 		.strip(),
 };
