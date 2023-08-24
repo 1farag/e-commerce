@@ -7,15 +7,19 @@ import * as schema from "../../validations/product.validation.js";
 import { auth } from "../../middleware/auth.js";
 import { validateRequest } from "../../middleware/validation.js";
 import { setUserId } from "../../controllers/product.controller.js";
-
+import accessFile from "../../middleware/multer.js";
+import reviewRouter from "./review.router.js";
 const productRouter = Router();
-
+productRouter.use("/:productId/reviews", reviewRouter);
 productRouter
 	.route("/")
 	.get(validateRequest(schema.getProductsValidator), controller.getProducts)
 	.post(
 		auth,
-		validateRequest(schema.createProductValidator),
+		accessFile("image").fields([
+			{ name: "imageCover", maxCount: 1 },
+			{ name: "images", maxCount: 10 },
+		]),
 		setUserId,
 		controller.createProduct
 	);
