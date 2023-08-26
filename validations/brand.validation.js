@@ -22,7 +22,6 @@ const getBrandsSchema = {
 		skip: z.number().optional(),
 		search: z.string().optional(),
 		fields: z.string().optional(),
-		confirmed: z.string().optional(),
 	}),
 };
 

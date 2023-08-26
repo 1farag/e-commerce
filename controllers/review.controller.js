@@ -8,7 +8,7 @@ import {
 import Review from "../models/review.model.js";
 export const setProductIdAndUserIdToBody = (req, res, next) => {
 	if (!req.body.product) req.body.product = req.params.productId;
-	if (!req.body.user) req.body.user = req.user._id;
+	if (!req.body.user) req.body.user = req.user._id.toString();
 	next();
 };
 

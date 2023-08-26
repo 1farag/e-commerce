@@ -6,6 +6,9 @@ const createReviewSchema = {
 		.object({
 			title: z.string().min(3).max(255),
 			ratings: z.number().min(1).max(5),
+			description: z.string().min(3).max(255),
+			product: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val)),
+			user: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val)),
 		})
 		.strict(),
 };

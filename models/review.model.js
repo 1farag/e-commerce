@@ -11,6 +11,10 @@ const reviewSchema = new mongoose.Schema(
 			max: [5, "Max ratings value is 5.0"],
 			required: [true, "review ratings required"],
 		},
+		description: {
+			type: String,
+			required: [true, "review description required"],
+		},
 		user: {
 			type: mongoose.Schema.ObjectId,
 			ref: "User",
@@ -25,9 +29,10 @@ const reviewSchema = new mongoose.Schema(
 	},
 	{ timestamps: true }
 );
+reviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 reviewSchema.pre(/^find/, function (next) {
-	this.populate({ path: "user", select: "firstName lastName profileImgUrl" });
+	this.populate({ path: "user", select: "firstName profileImgUrl" });
 	next();
 });
 
