@@ -29,12 +29,10 @@ const getReviewsSchema = {
 	}),
 };
 
+// add validation for update review using pick
 const updateReviewSchema = {
-	body: z.object({
-		title: z.string().min(3).max(255),
-		ratings: z.number().min(1).max(5),
-	}),
-};
+	body: createReviewSchema.body.pick({ title: true, description: true, ratings: true }).partial().strict(),
+}
 
 export const createReviewValidator = z.object({ ...createReviewSchema }).strip();
 export const reviewIdValidator = z.object({ ...reviewIdSchema }).strip();
