@@ -7,6 +7,7 @@ import categoryRouter from "./category.router.js";
 import brandRouter from "./brand.router.js";
 import reviewRouter from "./review.router.js";
 import couponRouter from "./coupon.router.js";
+import cartRouter from "./cart.router.js";
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.use("/subcategories", subCategoryRouter);
 router.use("/reviews", reviewRouter);
 router.use("/products", productRouter);
 router.use("/users", userRouter);
-router.use("coupon", couponRouter);
+router.use("/coupons", couponRouter);
+router.use("/cart", cartRouter);
 
 export default router;
