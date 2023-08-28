@@ -38,6 +38,12 @@ export class TokenExpiredError extends Error {
 	}
 }
 
+export class ItemAlreadyExist extends Error {
+	constructor(documentName) {
+		super(`Item already exist in ${documentName}`);
+	}
+}
+
 export class AuthenticationError extends Error {
 	constructor() {
 		super("Should be authenticate to access this route");
@@ -89,11 +95,17 @@ export class InvalidFileType extends Error {
 	}
 }
 
+export class InvalidCoupon extends Error {
+	constructor() {
+		super("Coupon is invalid or expired");
+	}
+}
+
 export class InvalidFileFormat extends Error {
 	constructor(fileFormat) {
 		super(`Invalid ${fileFormat} format.`);
 	}
-}	
+}
 
 export class EmailAlreadyExists extends Error {
 	constructor() {
@@ -113,9 +125,21 @@ export class FailedToDelete extends Error {
 	}
 }
 
+export class FailedToUpdate extends Error {
+	constructor(err) {
+		super(`Failed to update file : ${err.message}`);
+	}
+}
+
+export class FailedToGet extends Error {
+	constructor(err) {
+		super(`Failed to fetch data : ${err.message}`);
+	}
+}
 
 export class FailedToSendEmail extends Error {
 	constructor(err) {
 		super(`Failed to send email : ${err.message}`);
 	}
 }
+
