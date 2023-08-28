@@ -5,7 +5,7 @@ const createCouponSchema = {
 	body: z
 		.object({
 			name: z.string().min(3).max(255),
-			expire: z.date(),
+			expire: z.coerce.date(),
 			discount: z.number(),
 		})
 		.strict(),
@@ -28,7 +28,7 @@ const getCouponsSchema = {
 };
 
 const updateCouponSchema = {
-	body: createCouponSchema.body.omit({ name: true }),
+	body: createCouponSchema.body.omit({ name: true }).partial().strict(),
 };
 
 export const createCouponValidator = z.object({ ...createCouponSchema }).strip();

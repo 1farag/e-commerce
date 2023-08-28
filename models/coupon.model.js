@@ -8,7 +8,7 @@ const couponSchema = new mongoose.Schema(
 			unique: true,
 			uppercase: true,
 			required: "Name is required",
-			minlength: [6, "Too short"],
+			minlength: [4, "Too short"],
 			maxlength: [12, "Too long"],
 		},
 		expire: {
@@ -23,4 +23,6 @@ const couponSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-export default mongoose.model("Coupon", couponSchema);
+const Coupon = mongoose.model("Coupon", couponSchema);
+
+export default Coupon;

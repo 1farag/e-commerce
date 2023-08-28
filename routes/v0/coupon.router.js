@@ -6,6 +6,8 @@ import { validateRequest } from "../../middleware/validation.js";
 
 const couponRouter = Router();
 
+couponRouter.use(auth);
+
 couponRouter
 	.route("/")
 	.get(auth, validateRequest(schema.getCouponsValidator), controller.getCoupons)
