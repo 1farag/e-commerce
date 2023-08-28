@@ -6,10 +6,12 @@ import {
 	EmailAlreadyExists,
 	EmailAlreadyVerified,
 	InvalidCode,
+	InvalidCoupon,
 	InvalidFileFormat,
 	InvalidFileType,
 	InvalidHeaderToken,
 	InvalidToken,
+	ItemAlreadyExist,
 	RouteNotFound,
 	TokenExpiredError,
 	TokenIsBlocked,
@@ -44,7 +46,8 @@ export const globalErrorHandling = (err, req, res, next) => {
 		err instanceof TokenExpiredError ||
 		err instanceof multer.MulterError ||
 		err instanceof InvalidToken ||
-		err instanceof InvalidCode
+		err instanceof InvalidCode ||
+		err instanceof InvalidCoupon
 	)
 		response = new BadReqResponse(req, err);
 	else if (err instanceof RouteNotFound) response = new NotFoundRouteResponse(req, err);
@@ -55,7 +58,8 @@ export const globalErrorHandling = (err, req, res, next) => {
 	else if (
 		err instanceof UserAlreadyVerified ||
 		err instanceof EmailAlreadyVerified ||
-		err instanceof EmailAlreadyExists
+		err instanceof EmailAlreadyExists ||
+		err instanceof ItemAlreadyExist
 	)
 		response = new ConflictResponse(req, err);
 	else response = new InternalServerResponse(req, err);

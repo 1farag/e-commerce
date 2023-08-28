@@ -70,6 +70,11 @@ const UserSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		wishlist: {
+			type: [mongoose.Schema.Types.ObjectId],
+			ref: "Product",
+			default: [],
+		},
 	},
 	{ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
