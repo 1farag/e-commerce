@@ -105,3 +105,30 @@ export const deleteUserDB = async (userId) => {
 		session.endSession();
 	}
 };
+
+// wishlist
+
+export const addToWishlistDB = async (productId, userId) => {
+	const user = await User.findOneAndUpdate(
+		{ _id: userId },
+		{ $addToSet: { wishlist: productId } },
+		{ new: true }
+	)
+	return user;
+}
+
+
+export const removeFromWishlistDB = async (productId, userId) => {
+	const user = await User.findOneAndUpdate(
+		{ _id: userId },
+		{ $pull: { wishlist: productId } },
+		{ new: true }
+	)
+	return user;
+}
+
+export const getWishlistDB = async (userId) => {
+	const user = await User.findById(userId).populate("wishlist")
+	return user
+}
+

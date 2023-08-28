@@ -19,11 +19,18 @@ userRouter
 	.delete(auth, controller.deleteProfilePicture);
 
 userRouter
+	.route("/wishlist")
+	.get(auth, controller.getWishlist)
+	.post(auth, validateRequest(schema.wishlistProductValidator), controller.addToWishlist)
+	.delete(
+		auth,
+		validateRequest(schema.wishlistProductValidator),
+		controller.removeFromWishlist
+	);
+
+userRouter
 	.route("/:userId")
 	.get(auth, validateRequest(schema.getUserByIdValidator), controller.getProfileById)
 	.delete(auth, validateRequest(schema.getUserByIdValidator), controller.deleteUserById);
-
-
-
 
 export default userRouter;

@@ -21,5 +21,16 @@ const getUserByIdSchema = {
 		.strip(),
 };
 
+const wishlistProductSchema = {
+	body: z
+		.object({
+			productId: z
+				.string()
+				.refine((val) => mongoose.Types.ObjectId.isValid(val), "Invalid product id"),
+		})
+		.strip(),
+};
+
 export const updateUserValidator = z.object({ ...updateUserSchema }).strip();
 export const getUserByIdValidator = z.object({ ...getUserByIdSchema }).strip();
+export const wishlistProductValidator = z.object({ ...wishlistProductSchema }).strip();
