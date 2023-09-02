@@ -12,7 +12,12 @@ import notFoundRoute from "../middleware/notfoundRoute.js";
 
 export default function createServer() {
 	const app = express();
-	app.use(express.json());
+	app.use((req, res, next) => {
+		if (req.originalUrl === "/api/v0/orders/webhook") {
+			next();
+		}
+		express.json()(req, res, next);
+	});
 	app.use(express.urlencoded({ extended: true }));
 	app.use(cors());
 	app.use(morgan("tiny"));
